@@ -1,0 +1,5 @@
+build/
+
+# CLion
+CMakeUserPresets.json
+.idea/
