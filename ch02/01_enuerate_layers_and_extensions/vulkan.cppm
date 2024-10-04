@@ -2,16 +2,14 @@
 // Created by edukaj on 10/3/2024.
 //
 
-#if 0
-import std;
-#else
+module;
+
+#include <vulkan/vulkan.h>
+
 #include <iostream>
 #include <ranges>
 #include <string_view>
 #include <vector>
-#endif
-
-#include <vulkan/vulkan.h>
 
 export module vulkan;
 

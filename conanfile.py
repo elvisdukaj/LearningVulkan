@@ -39,8 +39,6 @@ class LearningVulkanRecipe(ConanFile):
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
-        tc.variables["CMAKE_EXPERIMENTAL_CXX_IMPORT_STD"] = "0e5b6991-d74f-4b3d-a41c-cf096e0b2508"
-        tc.variables["CMAKE_CXX_MODULE_STD "] = "ON"
         tc.variables["CMAKE_VERBOSE_MAKEFILE"] = "ON"
         tc.generate()
 

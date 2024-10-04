@@ -1,12 +1,8 @@
 cmake_minimum_required(VERSION 3.30)
 
-project(the-vulkan-cookbook CXX)
+include(cmake/enable_import_std.cmake)
 
-set(CMAKE_CXX_SCAN_FOR_MODULES ON)
-
-if (NOT CXX_MODULE_STD)
-    message(WARNING "CXX_MODULE_STD is ${CXX_MODULE_STD} and not supported")
-endif ()
+project(LearningVulkan CXX)
 
 find_package(VulkanLoader CONFIG REQUIRED)
 find_package(vulkan-validationlayers CONFIG REQUIRED)

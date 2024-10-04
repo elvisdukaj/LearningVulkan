@@ -1,5 +1,4 @@
 import vulkan;
-import std;
 
 int main() {
 
