@@ -13,7 +13,7 @@ include(cmake/common.cmake)
 set(WITH_CLANG_TIDY OFF)
 
 if (WITH_CLANG_TIDY)
-    set(CMAKE_CXX_CLANG_TIDY "clang-tidy")
+  set(CMAKE_CXX_CLANG_TIDY "clang-tidy")
 endif ()
 
 add_subdirectory(ch02)
