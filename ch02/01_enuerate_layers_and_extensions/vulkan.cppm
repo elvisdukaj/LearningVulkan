@@ -14,10 +14,14 @@ module;
 export module vulkan;
 
 export namespace Vulkan {
-
     struct LayerPropertiesAndExtensions {
         VkLayerProperties properties;
         std::vector<VkExtensionProperties> extensions;
+    };
+
+    struct LayersPropertiesAndExtensions {
+        std::vector<VkExtensionProperties> extensions;
+        std::vector<LayerPropertiesAndExtensions> layers;
     };
 
 }// namespace Vulkan
@@ -124,32 +128,39 @@ export namespace Vulkan {
         return result;
     }
 
-    std::vector<LayerPropertiesAndExtensions> enumerateLayerPropertiesAndExtensions() {
-        auto layers = enumerateLayerProperties();
+    LayersPropertiesAndExtensions enumerateLayerPropertiesAndExtensions() {
+        auto toVectorExtensionProperties =
+                [](const VkLayerProperties &layerProperties) -> std::vector<VkExtensionProperties> {
+            return enumerateExtensionProperties(layerProperties.layerName);
+        };
 
-        auto extensions = layers |
-                          std::views::transform(
-                                  [](const VkLayerProperties &layerProperties) -> std::vector<VkExtensionProperties> {
-                                      return enumerateExtensionProperties(layerProperties.layerName);
-                                  }) |
+        auto toLayerPropertiesAndExtensions =
+                [](const VkLayerProperties &layer,
+                   const std::vector<VkExtensionProperties> &extension) -> LayerPropertiesAndExtensions {
+            return LayerPropertiesAndExtensions{layer, extension};
+        };
+
+        LayersPropertiesAndExtensions layersAndExtensions;
+
+        layersAndExtensions.extensions = enumerateExtensionProperties("");
+
+        auto layers = enumerateLayerProperties();
+        auto extensions = layers | std::views::transform(toVectorExtensionProperties) |
                           std::ranges::to<std::vector<std::vector<VkExtensionProperties>>>();
 
-        auto res = std::views::zip_transform(
-                           [](auto &layer, auto &extension) -> LayerPropertiesAndExtensions {
-                               return LayerPropertiesAndExtensions{layer, extension};
-                           },
-                           layers, extensions) |
-                   std::ranges::to<std::vector<LayerPropertiesAndExtensions>>();
+        layersAndExtensions.layers = std::views::zip_transform(toLayerPropertiesAndExtensions, layers, extensions) |
+                                     std::ranges::to<std::vector<LayerPropertiesAndExtensions>>();
 
-        return res;
+        return layersAndExtensions;
     }
 
     auto print(const LayerPropertiesAndExtensions &layerPropertiesAndExtensions) {
         std::cout << layerPropertiesAndExtensions << std::endl;
     }
 
-    auto print(std::vector<LayerPropertiesAndExtensions> &layersPropertiesAndExtensions) {
-        for (const auto &layer: layersPropertiesAndExtensions) { Vulkan::print(layer); }
+    auto print(LayersPropertiesAndExtensions &layersPropertiesAndExtensions) {
+        std::cout << "Extensions:\n" << layersPropertiesAndExtensions.extensions << "\n";
+        for (const auto &layer: layersPropertiesAndExtensions.layers) { Vulkan::print(layer); }
     }
 
 }// namespace Vulkan

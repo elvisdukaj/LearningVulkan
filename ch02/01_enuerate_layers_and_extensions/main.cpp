@@ -1,10 +1,8 @@
 import vulkan;
 
 int main() {
-
   auto layersAndExtensions = Vulkan::enumerateLayerPropertiesAndExtensions();
-  for(const auto& layer : layersAndExtensions) {
-      Vulkan::print(layer);
-  }
+  Vulkan::print(layersAndExtensions);
+
   return 0;
 }
