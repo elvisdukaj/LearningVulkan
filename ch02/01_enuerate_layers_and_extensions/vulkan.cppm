@@ -6,8 +6,9 @@ module;
 
 #include <vulkan/vulkan.h>
 
-#include <iostream>
+#include <print>
 #include <ranges>
+#include <sstream>
 #include <string_view>
 #include <vector>
 
@@ -20,94 +21,83 @@ export namespace Vulkan {
     };
 
     struct LayersPropertiesAndExtensions {
-        std::vector<VkExtensionProperties> extensions;
-        std::vector<LayerPropertiesAndExtensions> layers;
+        std::vector<VkExtensionProperties> instanceExtensions;
+        std::vector<LayerPropertiesAndExtensions> layersPropertiesAndExtensions;
     };
 
 }// namespace Vulkan
 
 
-//namespace std {
-//    template<>
-//    struct formatter<VkLayerProperties> {
-//        constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
-//
-//        auto format(const VkLayerProperties &layerProperties, format_context &ctx) const {
-//            return format_to(ctx.out(),
-//                             "   spec version: {}\n"
-//                             "   implementation version: {}\n"
-//                             "   description: {}",
-//                             layerProperties.specVersion, layerProperties.implementationVersion,
-//                             layerProperties.description);
-//        }
-//    };
-//}// namespace std
+template<>
+struct std::formatter<VkLayerProperties> {
+    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
 
-std::ostream& operator<<(std::ostream& os, const VkLayerProperties& layerProperties) {
-    return os << "   spec version: " << layerProperties.specVersion << "\n"
-              << "   implementation version: " << layerProperties.implementationVersion << "\n"
-              << "   description: " << layerProperties.description;
-}
+    auto format(const VkLayerProperties& layerProperties, std::format_context& ctx) const {
+        return format_to(ctx.out(), "   - layer name: {}\n",
+                         "     spec version: {}\n"
+                         "     implementation version: {}\n"
+                         "     description: {}",
+                         layerProperties.layerName, layerProperties.specVersion, layerProperties.implementationVersion,
+                         layerProperties.description);
+    }
+};
 
-//template<>
-//struct std::formatter<VkExtensionProperties> {
-//    constexpr auto parse(std::format_parse_context &ctx) { return ctx.begin(); }
-//
-//    auto format(const VkExtensionProperties &extensionProperties, std::format_context &ctx) const {
-//        return std::format_to(ctx.out(),
-//                              "   extension name: {}\n"
-//                              "   spec version: {}\n",
-//                              extensionProperties.extensionName, extensionProperties.specVersion);
-//    }
-//};
+template<>
+struct std::formatter<VkExtensionProperties> {
+    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
 
-std::ostream& operator<<(std::ostream& os, const VkExtensionProperties& extensionProperties) {
-    return os << "     - extension name: " << extensionProperties.extensionName << "\n"
-              << "       spec version: " << extensionProperties.specVersion;
-}
+    auto format(const VkExtensionProperties& extensionProperties, std::format_context& ctx) const {
+        return std::format_to(ctx.out(),
+                              "     - name: {}\n"
+                              "       spec version: {}",
+                              extensionProperties.extensionName, extensionProperties.specVersion);
+    }
+};
 
-//template<>
-//struct std::formatter<std::vector<VkExtensionProperties>> {
-//    constexpr auto parse(std::format_parse_context &ctx) { return ctx.begin(); }
-//
-//    auto format(const std::vector<VkExtensionProperties> &extensionsProperties, std::format_context &ctx) const {
-//        auto it = ctx.out();
-//        for (const auto &extension: extensionsProperties) it = std::format_to(it, "{}", extension);
-//        return it;
-//    }
-//};
+template<>
+struct std::formatter<std::vector<VkExtensionProperties>> {
+    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
 
-std::ostream& operator<<(std::ostream& os, const std::vector<VkExtensionProperties>& extensionsProperties) {
-    for (const auto& extension: extensionsProperties) os << extension << "\n";
-    return os;
-}
+    auto format(const std::vector<VkExtensionProperties>& extensionsProperties, std::format_context& ctx) const {
+        auto out = ctx.out();
+        for (const VkExtensionProperties& extension: extensionsProperties) {
+            out = std::format_to(std::move(ctx.out()), "{}\n", extension);
+        }
+        return out;
+    }
+};
 
-//using Vulkan::LayerPropertiesAndExtensions;
-//
-//template<>
-//struct std::formatter<LayerPropertiesAndExtensions> {
-//    constexpr auto parse(std::format_parse_context &ctx) { return ctx.begin(); }
-//
-//    auto format(const LayerPropertiesAndExtensions &layerPropertiesAndExtensions,
-//                std::format_context &ctx) const {
-//        return std::format_to(ctx.out(),
-//                              "Layer: {}\n"
-//                              " properties:\n{}\n",
-//                              " extensions: {}", layerPropertiesAndExtensions.properties.layerName,
-//                              layerPropertiesAndExtensions.properties, layerPropertiesAndExtensions.extensions);
-//    }
-//};
+template<>
+struct std::formatter<Vulkan::LayerPropertiesAndExtensions> {
+    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
 
-std::ostream& operator<<(std::ostream& os, const Vulkan::LayerPropertiesAndExtensions& layerPropertiesAndExtensions) {
-    return os << "Layer " << layerPropertiesAndExtensions.properties.layerName << "\n"
-              << " properties:\n"
-              << layerPropertiesAndExtensions.properties << "\n"
-              << " - extensions:\n"
-              << layerPropertiesAndExtensions.extensions;
-}
+    auto format(const Vulkan::LayerPropertiesAndExtensions& layerPropertiesAndExtensions,
+                std::format_context& ctx) const {
+        return std::format_to(ctx.out(),
+                              "- layer: {}\n"
+                              "    properties: {}\n",
+                              "    extensions: {}", layerPropertiesAndExtensions.properties.layerName,
+                              layerPropertiesAndExtensions.properties, layerPropertiesAndExtensions.extensions);
+    }
+};
+
+template<>
+struct std::formatter<Vulkan::LayersPropertiesAndExtensions> {
+    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+    auto format(const Vulkan::LayersPropertiesAndExtensions& layersPropertiesAndExtensions,
+                std::format_context& ctx) const {
+        auto out = std::format_to(std::move(ctx.out()), "Instance extensions: {}\nLayers:\n",
+                                  layersPropertiesAndExtensions.instanceExtensions);
+        for (const Vulkan::LayerPropertiesAndExtensions& layerPropertiesAndExtensions:
+             layersPropertiesAndExtensions.layersPropertiesAndExtensions) {
+            out = std::format_to(std::move(ctx.out()), "{}", layerPropertiesAndExtensions);
+        }
+        return out;
+    }
+};
 
 export namespace Vulkan {
-
     std::vector<VkLayerProperties> enumerateLayerProperties() {
         uint32_t layerCount;
         vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -142,25 +132,41 @@ export namespace Vulkan {
 
         LayersPropertiesAndExtensions layersAndExtensions;
 
-        layersAndExtensions.extensions = enumerateExtensionProperties("");
+        layersAndExtensions.instanceExtensions = enumerateExtensionProperties("");
 
         auto layers = enumerateLayerProperties();
         auto extensions = layers | std::views::transform(toVectorExtensionProperties) |
                           std::ranges::to<std::vector<std::vector<VkExtensionProperties>>>();
 
-        layersAndExtensions.layers = std::views::zip_transform(toLayerPropertiesAndExtensions, layers, extensions) |
-                                     std::ranges::to<std::vector<LayerPropertiesAndExtensions>>();
+        layersAndExtensions.layersPropertiesAndExtensions =
+                std::views::zip_transform(toLayerPropertiesAndExtensions, layers, extensions) |
+                std::ranges::to<std::vector<LayerPropertiesAndExtensions>>();
 
         return layersAndExtensions;
     }
 
-    auto print(const LayerPropertiesAndExtensions& layerPropertiesAndExtensions) {
-        std::cout << layerPropertiesAndExtensions << std::endl;
+    void print(const LayerPropertiesAndExtensions& layerPropertiesAndExtensions) {
+        std::println(" - layer name: {}", layerPropertiesAndExtensions.properties.layerName);
+        std::println("   spec version: {}", layerPropertiesAndExtensions.properties.specVersion);
+        std::println("   implementation version: {}", layerPropertiesAndExtensions.properties.implementationVersion);
+        std::println("   extensions:");
+
+        for (const auto extension: layerPropertiesAndExtensions.extensions) {
+            std::println("     - name: {}", std::string_view{extension.extensionName});
+            std::println("       version: {}", extension.specVersion);
+        }
     }
 
     auto print(LayersPropertiesAndExtensions& layersPropertiesAndExtensions) {
-        std::cout << "Extensions:\n" << layersPropertiesAndExtensions.extensions << "\n";
-        for (const auto& layer: layersPropertiesAndExtensions.layers) { Vulkan::print(layer); }
-    }
 
+        std::println("Instance extensions:");
+        for (const auto extension: layersPropertiesAndExtensions.instanceExtensions) {
+            std::println("  - name: {}\n"
+                         "    version: {}",
+                         extension.extensionName, extension.specVersion);
+        }
+
+        std::println("Layers:");
+        for (const auto& layer: layersPropertiesAndExtensions.layersPropertiesAndExtensions) { Vulkan::print(layer); }
+    }
 }// namespace Vulkan
