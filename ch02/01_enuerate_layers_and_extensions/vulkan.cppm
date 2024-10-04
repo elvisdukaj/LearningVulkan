@@ -43,7 +43,7 @@ export namespace Vulkan {
 //    };
 //}// namespace std
 
-std::ostream &operator<<(std::ostream &os, const VkLayerProperties &layerProperties) {
+std::ostream& operator<<(std::ostream& os, const VkLayerProperties& layerProperties) {
     return os << "   spec version: " << layerProperties.specVersion << "\n"
               << "   implementation version: " << layerProperties.implementationVersion << "\n"
               << "   description: " << layerProperties.description;
@@ -61,7 +61,7 @@ std::ostream &operator<<(std::ostream &os, const VkLayerProperties &layerPropert
 //    }
 //};
 
-std::ostream &operator<<(std::ostream &os, const VkExtensionProperties &extensionProperties) {
+std::ostream& operator<<(std::ostream& os, const VkExtensionProperties& extensionProperties) {
     return os << "     - extension name: " << extensionProperties.extensionName << "\n"
               << "       spec version: " << extensionProperties.specVersion;
 }
@@ -77,8 +77,8 @@ std::ostream &operator<<(std::ostream &os, const VkExtensionProperties &extensio
 //    }
 //};
 
-std::ostream &operator<<(std::ostream &os, const std::vector<VkExtensionProperties> &extensionsProperties) {
-    for (const auto &extension: extensionsProperties) os << extension << "\n";
+std::ostream& operator<<(std::ostream& os, const std::vector<VkExtensionProperties>& extensionsProperties) {
+    for (const auto& extension: extensionsProperties) os << extension << "\n";
     return os;
 }
 
@@ -98,7 +98,7 @@ std::ostream &operator<<(std::ostream &os, const std::vector<VkExtensionProperti
 //    }
 //};
 
-std::ostream &operator<<(std::ostream &os, const Vulkan::LayerPropertiesAndExtensions &layerPropertiesAndExtensions) {
+std::ostream& operator<<(std::ostream& os, const Vulkan::LayerPropertiesAndExtensions& layerPropertiesAndExtensions) {
     return os << "Layer " << layerPropertiesAndExtensions.properties.layerName << "\n"
               << " properties:\n"
               << layerPropertiesAndExtensions.properties << "\n"
@@ -130,13 +130,13 @@ export namespace Vulkan {
 
     LayersPropertiesAndExtensions enumerateLayerPropertiesAndExtensions() {
         auto toVectorExtensionProperties =
-                [](const VkLayerProperties &layerProperties) -> std::vector<VkExtensionProperties> {
+                [](const VkLayerProperties& layerProperties) -> std::vector<VkExtensionProperties> {
             return enumerateExtensionProperties(layerProperties.layerName);
         };
 
         auto toLayerPropertiesAndExtensions =
-                [](const VkLayerProperties &layer,
-                   const std::vector<VkExtensionProperties> &extension) -> LayerPropertiesAndExtensions {
+                [](const VkLayerProperties& layer,
+                   const std::vector<VkExtensionProperties>& extension) -> LayerPropertiesAndExtensions {
             return LayerPropertiesAndExtensions{layer, extension};
         };
 
@@ -154,13 +154,13 @@ export namespace Vulkan {
         return layersAndExtensions;
     }
 
-    auto print(const LayerPropertiesAndExtensions &layerPropertiesAndExtensions) {
+    auto print(const LayerPropertiesAndExtensions& layerPropertiesAndExtensions) {
         std::cout << layerPropertiesAndExtensions << std::endl;
     }
 
-    auto print(LayersPropertiesAndExtensions &layersPropertiesAndExtensions) {
+    auto print(LayersPropertiesAndExtensions& layersPropertiesAndExtensions) {
         std::cout << "Extensions:\n" << layersPropertiesAndExtensions.extensions << "\n";
-        for (const auto &layer: layersPropertiesAndExtensions.layers) { Vulkan::print(layer); }
+        for (const auto& layer: layersPropertiesAndExtensions.layers) { Vulkan::print(layer); }
     }
 
 }// namespace Vulkan
