@@ -11,7 +11,7 @@ class LearningVulkanRecipe(ConanFile):
     license = "MIT"
     author = "Elvis Dukaj <elvis.dukaj@gmail.com>"
     url = "<Package recipe repository url here, for issues about the package>"
-    description = "<Description of the-vulkan-cookbook package here>"
+    description = "<Description of LearningVulkan package here>"
     topics = ("vulkan", "graphics", "rendering")
 
     # Binary configuration
